@@ -23,7 +23,7 @@ import csv
 import weight_stats as ws
 import datetime
 from random import normalvariate
-#import CCMP_HISTOGRAM as ccmp
+import CCMP_HISTOGRAM as ccmp
 from scipy.stats import mannwhitneyu
 from scipy.stats import f_oneway
 import AMT_mapo as mapo
@@ -260,7 +260,7 @@ def unc_bin(data,window):
                 out[i] = np.nan
     return np.squeeze(out)
 
-def plot_latitude(ax,AMT,let,vals = [7,1]):
+def plot_latitude(ax,AMT,let,vals = [7,1],ylim = [-25,15]):
     han = ax.errorbar(AMT['latitude'],AMT['EC_flux'],np.sqrt(AMT['EC_flux_u']**2),color='k',linestyle='None',marker= 'o')
     han2 = ax.errorbar(AMT['latitude'],AMT['vt'][:,vals[0]],np.sqrt(AMT['vts'][:,vals[0]]**2 + AMT['vtse'][:,vals[0]]**2),color='r',linestyle='None',marker= 'o')
     han3 = ax.errorbar(AMT['latitude'],AMT['nvt'][:,vals[1]],np.sqrt(AMT['nvts'][:,vals[1]]**2 + AMT['nvtse'][:,vals[1]]**2),color='b',linestyle='None',marker= 'o')
@@ -275,14 +275,14 @@ def plot_latitude(ax,AMT,let,vals = [7,1]):
     #ax.text(58,18,,fontweight='bold',fontsize=18)
     ax.set_xlim([60,-60])
     ax.plot([60,-60],[0,0],'k--')
-    ax.set_ylim([-25,15])
+    ax.set_ylim(ylim)
     ax.legend([han,han2,han3],['Direct EC flux','Indirect flux with Vertical Temperature Gradients','Indirect flux with no Vertical Temperature Gradients'],loc=3,fontsize=13)
 
 def plot_latitude_diff(ax,AMT,let,vals = [7,1]):
-    han2 = ax.errorbar(AMT['latitude'],AMT['EC_flux']-AMT['vt'][:,vals[0]],np.sqrt(AMT['vts'][:,vals[0]]**2 + AMT['vtse'][:,vals[0]]**2 + AMT['EC_flux_u']**2 + AMT['EC_SE']**2),color='r',linestyle='None',marker= 'o')
-    han3 = ax.errorbar(AMT['latitude'],AMT['EC_flux']-AMT['nvt'][:,vals[1]],np.sqrt(AMT['nvts'][:,vals[1]]**2 + AMT['nvtse'][:,vals[1]]**2 + AMT['EC_flux_u']**2 + AMT['EC_SE']**2),color='b',linestyle='None',marker= 'o')
+    han2 = ax.errorbar(AMT['latitude'],AMT['EC_flux']-AMT['vt'][:,vals[0]],np.sqrt(AMT['vts'][:,vals[0]]**2 + AMT['EC_flux_u']**2 ),color='r',linestyle='None',marker= 'o')
+    han3 = ax.errorbar(AMT['latitude'],AMT['EC_flux']-AMT['nvt'][:,vals[1]],np.sqrt(AMT['nvts'][:,vals[1]]**2  + AMT['EC_flux_u']**2 ),color='b',linestyle='None',marker= 'o')
     ax.invert_xaxis()
-    ax.set_ylabel('Direct EC CO$_2$ flux - Indirect CO$_2$ flux (mmol m$^{-2}$ d$^{-1}$)')
+    ax.set_ylabel('Direct EC - Indirect bulk CO$_2$ flux (mmol m$^{-2}$ d$^{-1}$)')
     ax.set_xlabel('Latitude ($^o$N)')
     ax.grid()
     ax.text(0.03,0.95,r"{\fontsize{20}{22}\textbf{(" + let + ")}}",transform=ax.transAxes,va='top')
@@ -552,21 +552,23 @@ fig11.savefig('FIGS/Diurnal_Tsubskin_check.png',format='png',dpi=300)
 #--------------------------------------------------------------------------------------------------------------------------------
 # Main figure 1
 
-fig = plt.figure(figsize=(15,15))
-gs = GridSpec(2 ,2, figure=fig, wspace=0.2,hspace=0.2,bottom=0.05,top=0.97,left=0.07,right=0.95) # Setup a 2x2 subplot grid
+fig = plt.figure(figsize=(21,15))
+gs = GridSpec(2 ,3, figure=fig, wspace=0.2,hspace=0.2,bottom=0.05,top=0.97,left=0.07,right=0.95) # Setup a 2x2 subplot grid
 ax1 = fig.add_subplot(gs[0,1]) # Set top row into a single plot
 ax2 = fig.add_subplot(gs[1,1])
 ax3 = fig.add_subplot(gs[1,0]) # Set bottom row into two plots
 ax4 = fig.add_subplot(gs[0,0])
-# ax5 = fig.add_subplot(gs[2,0])
-# ax6 = fig.add_subplot(gs[2,1])
+ax5 = fig.add_subplot(gs[0,2])
+ax6 = fig.add_subplot(gs[1,2])
 ax1.set_title('AMT28')
 ax2.set_title('AMT29')
-plot_latitude(ax1,AMT[0],'b')
-plot_latitude(ax2,AMT[1],'d')
-# plot_latitude_diff(ax5,AMT[0],'e')
-# plot_latitude_diff(ax6,AMT[1],'f')
-plot_scatter(ax3,AMT_m,'c','STATS/ALL.csv')
+ax5.set_title('AMT28')
+ax6.set_title('AMT29')
+plot_latitude(ax1,AMT[0],'b',ylim=[-15,10])
+plot_latitude(ax2,AMT[1],'e')
+plot_latitude_diff(ax5,AMT[0],'c')
+plot_latitude_diff(ax6,AMT[1],'f')
+plot_scatter(ax3,AMT_m,'d','STATS/ALL.csv')
 mapo.plotmap(ax4)
 fig.savefig('FIGS/FIG_2_EC_FE_FLUX_COMPARISION.png',format='png',dpi=300)
 
