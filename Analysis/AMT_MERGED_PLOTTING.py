@@ -54,6 +54,7 @@ def data_load_feout(file,time_i,window,cutoff = 0.5):
     fco2_sw = np.array(c.variables['fCO2_sw_mean'])
     Tskin_unc = np.array(c.variables['Tskin_uncertainty'])
     ws = np.array(c.variables['U10n_mean'])
+    tair = np.array(c.variables['Tair_mean'])
     c.close()
     # Saving the raw data into a structure
     struct_m = {
@@ -73,7 +74,8 @@ def data_load_feout(file,time_i,window,cutoff = 0.5):
         'fco2_atm':fco2_atm,
         'time':time,
         'Tskin_unc':Tskin_unc,
-        'U10n':ws
+        'U10n':ws,
+        'Tair': tair
     }
     # Saving structure with data averaged to a fixed 3 hour time window
     # Currently data is averaged onto a time grid supplied (i.e from Tom Bell's data)
@@ -593,16 +595,16 @@ fig.savefig('FIGS/FIG_2_EC_FE_FLUX_COMPARISION.png',format='png',dpi=300)
 #--------------------------------------------------------------------------------------------------------------------------------
 # Cool Skin effects plot
 
-fig3 = plt.figure(figsize=(10,15))
-gs = GridSpec(2,1, figure=fig3, wspace=0.15,hspace=0.2,bottom=0.08,top=0.95,left=0.1,right=0.95) # Setup a 2x2 subplot grid
+fig3 = plt.figure(figsize=(20,15))
+gs = GridSpec(2,2, figure=fig3, wspace=0.15,hspace=0.2,bottom=0.05,top=0.98,left=0.1,right=0.95) # Setup a 2x2 subplot grid
 ax1 = fig3.add_subplot(gs[0,0])
 ax2 = fig3.add_subplot(gs[1,0])
+ax3 = fig3.add_subplot(gs[0,1])
+ax4 = fig3.add_subplot(gs[1,1])
 ax1.scatter(AMT_r[0]['latitude'],AMT_r[0]['Tsubskin_co'] - AMT_r[0]['Tskin']+273.15,color='r')
 ax1.scatter(AMT_r[0]['latitude'],AMT_r[0]['Tsubskin_don'] - AMT_r[0]['Tskin']+273.15,color='b')
 ax1.plot([-50,50],[0.17,0.17],'k--')
-ax2.scatter(AMT_r[1]['latitude'],AMT_r[1]['Tsubskin_co'] - AMT_r[1]['Tskin']+273.15,color='r')
-ax2.scatter(AMT_r[1]['latitude'],AMT_r[1]['Tsubskin_don'] - AMT_r[1]['Tskin']+273.15,color='b')
-ax2.plot([-50,50],[0.17,0.17],'k--')
+
 ax1.invert_xaxis()
 ax1.set_ylabel('AMT28 Cool Skin (K)')
 ax1.set_xlabel('Latitude ($^o$N)')
@@ -611,8 +613,11 @@ ax1.set_xlim([60,-60])
 ax1.set_ylim([0,0.6])
 ax1.legend(['NOAA COARE 3.5','Donlon et al. (2002)','Fixed Cool Skin'],loc=1,fontsize=13)
 ax1.text(0.03,0.95,r"{\fontsize{20}{22}\textbf{(a)}}",transform=ax1.transAxes,va='top')
-ax2.text(0.03,0.95,r"{\fontsize{20}{22}\textbf{(b)}}",transform=ax2.transAxes,va='top')
 
+
+ax2.scatter(AMT_r[1]['latitude'],AMT_r[1]['Tsubskin_co'] - AMT_r[1]['Tskin']+273.15,color='r')
+ax2.scatter(AMT_r[1]['latitude'],AMT_r[1]['Tsubskin_don'] - AMT_r[1]['Tskin']+273.15,color='b')
+ax2.plot([-50,50],[0.17,0.17],'k--')
 ax2.invert_xaxis()
 ax2.set_ylabel('AMT29 Cool Skin (K)')
 ax2.set_xlabel('Latitude ($^o$N)')
@@ -620,6 +625,28 @@ ax2.grid()
 ax2.set_ylim([0,0.6])
 ax2.set_xlim([60,-60])
 ax2.legend(['NOAA COARE 3.5','Donlon et al. (2002)','Fixed Cool Skin'],loc=1,fontsize=13)
+ax2.text(0.03,0.95,r"{\fontsize{20}{22}\textbf{(b)}}",transform=ax2.transAxes,va='top')
+
+ax3.scatter(AMT_r[0]['latitude'],AMT_r[0]['U10n'],color='r')
+ax3.scatter(AMT_r[1]['latitude'],AMT_r[1]['U10n'],color='b')
+ax3.invert_xaxis()
+ax3.grid()
+ax3.set_xlim([60,-60])
+ax3.set_xlabel('Latitude ($^o$N)')
+ax3.set_ylabel('Wind speed (ms${^-1}$)')
+ax3.legend(['AMT28','AMT29'],loc=1,fontsize=13)
+ax3.text(0.03,0.95,r"{\fontsize{20}{22}\textbf{(c)}}",transform=ax3.transAxes,va='top')
+
+ax4.scatter(AMT_r[0]['latitude'],AMT_r[0]['Tair'] - AMT_r[0]['Tskin']+273.15,color='r')
+ax4.scatter(AMT_r[1]['latitude'],AMT_r[1]['Tair'] - AMT_r[1]['Tskin']+273.15,color='b')
+ax4.plot([-50,50],[0,0],'k--')
+ax4.invert_xaxis()
+ax4.grid()
+ax4.set_xlim([60,-60])
+ax4.set_xlabel('Latitude ($^o$N)')
+ax4.set_ylabel('T$_{air}$ - T$_{skin}$ (K)')
+ax4.legend(['AMT28','AMT29','0'],loc=1,fontsize=13)
+ax4.text(0.03,0.95,r"{\fontsize{20}{22}\textbf{(d)}}",transform=ax4.transAxes,va='top')
 fig3.savefig('FIGS/SUP_FIG_1_COARE_COOL_SKIN.png',format='png',dpi=300)
 #--------------------------------------------------------------------------------------------------------------------------------
 # Per cruise plots
@@ -738,7 +765,7 @@ def wind_speed_split(ax,window,split_val,let=['','',''],val=[7,1]):
     ax[0].set_title('U$_{10}$ $\leq$' +str(split_val[0]) + 'ms$^{-1}$')
     ax[1].set_title(str(split_val[0]) + 'ms$^{-1}$ $<$ U$_{10}$ $\leq$ ' +str(split_val[1]) + 'ms$^{-1}$')
     ax[2].set_title( str(split_val[1]) + 'ms$^{-1}$ $<$ U$_{10}$')
-    ax[0].set_ylabel('Bulk CO$_2$ Flux (mmol m$^{-2}$ d$^{-1}$)')
+    ax[0].set_ylabel('Indirect CO$_2$ Flux (mmol m$^{-2}$ d$^{-1}$)')
 
 fig10 = plt.figure(figsize=(21,7))
 gs = GridSpec(1,3, figure=fig10, wspace=0.33,hspace=0.2,bottom=0.1,top=0.95,left=0.1,right=0.95)
