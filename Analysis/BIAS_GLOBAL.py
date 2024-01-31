@@ -116,11 +116,11 @@ ws[np.isnan(ws) == 1] = 7
 
 land = load_land_area('C:/Users/df391/Anaconda3/envs/FluxEngine/Lib/site-packages/fluxengine/data/onedeg_land.nc')
 mask = load_sea_mask('C:/Users/df391/Anaconda3/envs/FluxEngine/Lib/site-packages/fluxengine/data/World_Seas-IHO-mask.nc')
-gcb_mod = load_gcb('GLOBAL_CARBON_BUDGET/Ocean_carbon_uptake_GOBMs_gridded_GCB2022_2012-2021_mean.nc','fgco2_A_avg')
+gcb_mod = load_gcb('GLOBAL_CARBON_BUDGET/Ocean_carbon_uptake_GOBMs_gridded_GCB2023_2013-2022_mean.nc','fgco2_A_avg')
 gcb_mod = grid_flip(np.flipud(gcb_mod))
 
 
-gcb_prod = load_gcb('GLOBAL_CARBON_BUDGET\Ocean_carbon_uptake_dataproducts_gridded_GCB2022_2012-2021_mean.nc','fgco2_ensemble_avg')
+gcb_prod = load_gcb('GLOBAL_CARBON_BUDGET\Ocean_carbon_uptake_dataproducts_gridded_GCB2023_2013-2022_mean.nc','fgco2_ensemble_avg')
 gcb_prod = grid_flip(np.flipud(gcb_prod))
 
 area = np.empty((land.shape[0]))
