@@ -41,21 +41,21 @@ print(lat)
 
 #Plotting
 
-
+cols = ['#332288','#44AA99','#DDCC77', '#117733', '#88CCEE','#999933','#CC6677']
 lim = np.array([330,450])
 fig1 = plt.figure(figsize=(15,7))
 gs = GridSpec(1,2, figure=fig1, wspace=0.33,hspace=0.2,bottom=0.1,top=0.95,left=0.15,right=0.9)
 ax1 = fig1.add_subplot(gs[0,0])
 f = out['Depth'] == 2
-ax1.scatter(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],color='tab:blue',label='2m')
-ax1.errorbar(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],yerr = 2.6,xerr=10,linestyle='',color='tab:blue')
+ax1.scatter(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],color=cols[0],label='2m')
+ax1.errorbar(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],yerr = 2.6,xerr=10,linestyle='',color=cols[0])
 f = out['Depth'] == 5
 w = ws.unweighted_stats(np.array(out['fCO2w_calcTADIC'])[f],np.array(out['fCO2w_meas'])[f],'TA_DIC')
 w2 = ws.unweighted_stats(np.array(out['fCO2w_calcTADIC']),np.array(out['fCO2w_meas']),'TA_DIC')
-ax1.scatter(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],color='tab:orange',label='5m')
-ax1.errorbar(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],yerr = 2.6,xerr=10,linestyle='',color='tab:orange')
+ax1.scatter(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],color=cols[1],label='5m')
+ax1.errorbar(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],yerr = 2.6,xerr=10,linestyle='',color=cols[1])
 ax1.plot(lim,lim,'k-')
-ax1.plot(lim,lim*w['slope'] + w['intercept'],linestyle='--',color='tab:orange')
+ax1.plot(lim,lim*w['slope'] + w['intercept'],linestyle='--',color=cols[1])
 ax1.plot(lim,lim*w2['slope'] + w2['intercept'],linestyle='--',color='k')
 ax1.set_xlabel('DIC/TA derived fCO$_{2 (sw,depth)}$ ($\mu$atm)')
 ax1.set_ylabel('SFCE estimated fCO$_{2 (sw,depth)}$ ($\mu$atm)')
@@ -67,15 +67,15 @@ print(w)
 print(w2)
 
 f = out['Depth'] == 10
-ax1.scatter(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],color='tab:green',label = '10m')
-ax1.errorbar(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],yerr = 2.6,xerr=10,linestyle='',color='tab:green')
+ax1.scatter(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],color=cols[2],label = '10m')
+ax1.errorbar(out['fCO2w_calcTADIC'][f],out['fCO2w_meas'][f],yerr = 2.6,xerr=10,linestyle='',color=cols[2])
 ax1.legend(loc = 3)
 ax2 = fig1.add_subplot(gs[0,1])
 dep = [2,5,10]
 for i in range(0,len(dep)):
     f = out['Depth'] == dep[i]
-    ax2.scatter(lat[f],out['fCO2w_calcTADIC'][f]-out['fCO2w_meas'][f],label=str(dep[i])+'m')
-    ax2.errorbar(lat[f],out['fCO2w_calcTADIC'][f]-out['fCO2w_meas'][f],yerr=np.sqrt(2.6**2 + 10**2),linestyle='')
+    ax2.scatter(lat[f],out['fCO2w_calcTADIC'][f]-out['fCO2w_meas'][f],label=str(dep[i])+'m',color=cols[i])
+    ax2.errorbar(lat[f],out['fCO2w_calcTADIC'][f]-out['fCO2w_meas'][f],yerr=np.sqrt(2.6**2 + 10**2),linestyle='',color=cols[i])
 ax2.set_ylabel('DIC/TA derived fCO$_{2 (sw,depth)}$ - SFCE estimated fCO$_{2 (sw,depth)}$ ($\mu$atm)')
 ax2.set_xlabel('Latitude ($^{o}$N)')
 ax2.grid()

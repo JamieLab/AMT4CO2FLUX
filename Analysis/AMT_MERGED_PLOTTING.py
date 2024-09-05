@@ -262,10 +262,10 @@ def unc_bin(data,window):
                 out[i] = np.nan
     return np.squeeze(out)
 
-def plot_latitude(ax,AMT,let,vals = [7,1],ylim = [-25,15]):
-    han = ax.errorbar(AMT['latitude'],AMT['EC_flux'],np.sqrt(AMT['EC_flux_u']**2),color='k',linestyle='None',marker= 'o')
-    han2 = ax.errorbar(AMT['latitude'],AMT['vt'][:,vals[0]],np.sqrt(AMT['vts'][:,vals[0]]**2 + AMT['vtse'][:,vals[0]]**2),color='r',linestyle='None',marker= 'o')
-    han3 = ax.errorbar(AMT['latitude'],AMT['nvt'][:,vals[1]],np.sqrt(AMT['nvts'][:,vals[1]]**2 + AMT['nvtse'][:,vals[1]]**2),color='b',linestyle='None',marker= 'o')
+def plot_latitude(ax,AMT,let,vals = [7,1],ylim = [-25,15],leg=False):
+    han = ax.errorbar(AMT['latitude'],AMT['EC_flux'],np.sqrt(AMT['EC_flux_u']**2),color='k',linestyle='None',marker= 'd')
+    han2 = ax.errorbar(AMT['latitude'],AMT['vt'][:,vals[0]],np.sqrt(AMT['vts'][:,vals[0]]**2),color='r',linestyle='None',marker= 's')
+    han3 = ax.errorbar(AMT['latitude'],AMT['nvt'][:,vals[1]],np.sqrt(AMT['nvts'][:,vals[1]]**2),color='b',linestyle='None',marker= 'o')
     opacity_bar(han)
     opacity_bar(han2)
     opacity_bar(han3)
@@ -278,10 +278,11 @@ def plot_latitude(ax,AMT,let,vals = [7,1],ylim = [-25,15]):
     ax.set_xlim([60,-60])
     ax.plot([60,-60],[0,0],'k--')
     ax.set_ylim(ylim)
-    ax.legend([han,han2,han3],['Direct EC flux','Indirect flux with Vertical Temperature Gradients','Indirect flux with no Vertical Temperature Gradients'],loc=3,fontsize=13)
-
-def plot_latitude_diff(ax,AMT,let,vals = [7,1]):
-    han2 = ax.errorbar(AMT['latitude'],AMT['EC_flux']-AMT['vt'][:,vals[0]],np.sqrt(AMT['vts'][:,vals[0]]**2 + AMT['EC_flux_u']**2 ),color='r',linestyle='None',marker= 'o')
+    if leg:
+        ax.legend([han,han2,han3],['Direct EC flux','Indirect flux with Vertical Temperature Gradients','Indirect flux with no Vertical Temperature Gradients'],fontsize=18,bbox_to_anchor=[1.12, -0.12], loc='upper center')
+    #return [han,han2,han3]
+def plot_latitude_diff(ax,AMT,let,vals = [7,1],leg=False):
+    han2 = ax.errorbar(AMT['latitude'],AMT['EC_flux']-AMT['vt'][:,vals[0]],np.sqrt(AMT['vts'][:,vals[0]]**2 + AMT['EC_flux_u']**2 ),color='r',linestyle='None',marker= 's')
     han3 = ax.errorbar(AMT['latitude'],AMT['EC_flux']-AMT['nvt'][:,vals[1]],np.sqrt(AMT['nvts'][:,vals[1]]**2  + AMT['EC_flux_u']**2 ),color='b',linestyle='None',marker= 'o')
     ax.invert_xaxis()
     ax.set_ylabel('Direct EC - Indirect bulk CO$_2$ flux (mmol m$^{-2}$ d$^{-1}$)')
@@ -292,9 +293,10 @@ def plot_latitude_diff(ax,AMT,let,vals = [7,1]):
     ax.set_xlim([60,-60])
     ax.plot([60,-60],[0,0],'k--')
     ax.set_ylim([-15,10])
-    ax.legend([han2,han3],['Indirect flux with Vertical Temperature Gradients','Indirect flux with no Vertical Temperature Gradients'],loc=3,fontsize=13)
+    if leg:
+        ax.legend([han2,han3],['Indirect flux with Vertical Temperature Gradients','Indirect flux with no Vertical Temperature Gradients'],fontsize=18,bbox_to_anchor=[0.5, -0.12], loc='upper center')
 
-def plot_scatter(ax,AMT,let,file,lims=[-30,20],vals = [7,1]):
+def plot_scatter(ax,AMT,let,file,lims=[-35,25],vals = [7,1],leg=False,ylab = True):
     lims = np.array(lims)
     if len(AMT['vt'].shape) >1:
         f = (np.isnan(AMT['EC_flux']) == 0) & (np.isnan(AMT['vt'][:,vals[0]]) ==0) &  (np.isnan(AMT['nvt'][:,vals[1]]) ==0)
@@ -303,32 +305,38 @@ def plot_scatter(ax,AMT,let,file,lims=[-30,20],vals = [7,1]):
     print(len(f))
     g = np.argwhere((AMT['EC_flux'][f] < 5) & (AMT['EC_flux'][f] > -5))
     #print(len(g)/len(AMT['EC_flux'][f]))
-
+    cold = 'b'#'#44AA99'
+    warm = 'r'#'#882255'
+    alp = 0.6
     if len(f) > 1:
-        han =ax.errorbar(AMT['EC_flux'][f],AMT['vt'][f,vals[0]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['vts'][f,vals[0]]**2),color='r',linestyle='none',linewidth=0.6,marker = 'o',alpha = 0.5,markersize = 4)
-        han2 = ax.errorbar(AMT['EC_flux'][f],AMT['nvt'][f,vals[1]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['nvts'][f,vals[1]]**2),color='b',linestyle='none',linewidth=0.6,marker = 'o',alpha = 0.5,markersize = 4)
+        han =ax.errorbar(AMT['EC_flux'][f],AMT['vt'][f,vals[0]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['vts'][f,vals[0]]**2),color=warm,linestyle='none',linewidth=0.6,marker = 's',alpha = alp,markersize = 4)
+        han2 = ax.errorbar(AMT['EC_flux'][f],AMT['nvt'][f,vals[1]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['nvts'][f,vals[1]]**2),color=cold,linestyle='none',linewidth=0.6,marker = 'o',alpha = alp,markersize = 4)
         vt = ws.unweighted_stats(AMT['EC_flux'][f],AMT['vt'][f,vals[0]],'vt')
         nvt = ws.unweighted_stats(AMT['EC_flux'][f],AMT['nvt'][f,vals[1]],'nvt')
     else:
-        han =ax.errorbar(AMT['EC_flux'][f],AMT['vt'][vals[0]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['vts'][vals[0]]**2),color='r',linestyle='none',linewidth=0.6,marker = 'o',alpha = 0.5,markersize = 4)
-        han2 = ax.errorbar(AMT['EC_flux'][f],AMT['nvt'][vals[1]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['nvts'][vals[1]]**2),color='b',linestyle='none',linewidth=0.6,marker = 'o',alpha = 0.5,markersize = 4)
+        han =ax.errorbar(AMT['EC_flux'][f],AMT['vt'][vals[0]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['vts'][vals[0]]**2),color=warm,linestyle='none',linewidth=0.6,marker = 's',alpha = alp,markersize = 4)
+        han2 = ax.errorbar(AMT['EC_flux'][f],AMT['nvt'][vals[1]],xerr=np.sqrt(AMT['EC_flux_u'][f]**2),yerr= np.sqrt(AMT['nvts'][vals[1]]**2),color=cold,linestyle='none',linewidth=0.6,marker = 'o',alpha = alp,markersize = 4)
         vt = ws.unweighted_stats(AMT['EC_flux'][f],np.array(AMT['vt'][vals[0]]),'vt')
         nvt = ws.unweighted_stats(AMT['EC_flux'][f],np.array(AMT['nvt'][vals[1]]),'nvt')
     opacity_bar(han)
     opacity_bar(han2)
-    ax.plot(lims,lims*vt['slope'] + vt['intercept'],'r--')
-    ax.plot(lims,lims*nvt['slope'] + nvt['intercept'],'b--')
+    ax.plot(lims,lims*vt['slope'] + vt['intercept'],color = warm,linestyle='--')
+    ax.plot(lims,lims*nvt['slope'] + nvt['intercept'],color = cold,linestyle='--')
     ax.plot(lims,lims,'k-.')
     ax.set_xlim(lims)
     ax.set_ylim(lims)
     ax.grid()
-    ax.set_ylabel('Indirect CO$_2$ Flux (mmol m$^{-2}$ d$^{-1}$)')
+    if ylab:
+        ax.set_ylabel('Indirect CO$_2$ Flux (mmol m$^{-2}$ d$^{-1}$)')
     ax.set_xlabel('Direct EC CO$_2$ Flux (mmol m$^{-2}$ d$^{-1}$)')
-    ax.legend([han,han2],['Vertical Temperature Gradients','No Vertical Temperature Gradients'],loc=4,fontsize=13)
+    if leg=='1':
+        ax.legend([han,han2],['Vertical Temperature Gradients','No Vertical Temperature Gradients'],fontsize=18,bbox_to_anchor=[0.5, -0.12], loc='upper center')
+    elif leg == '2':
+        ax.legend([han,han2],['Vertical Temperature Gradients','No Vertical Temperature Gradients'],fontsize=18,loc='lower right')
     ax.text(0.03,0.95,r"{\fontsize{20}{22}\textbf{(" + let + ")}}" + '\n',transform=ax.transAxes,va = 'top')
-    ax.text(0.11,0.95, r"{\fontsize{14}{15}\textbf{ Temperature Gradients (n = " + str(vt['n']) + ")}}" + '\n' + r"{\fontsize{14}{15}\textmd{RMSD =  "+str(round(vt['rmsd'],2)) + r" mmol m\textsuperscript{-2} d\textsuperscript{-1}} }" + '\n' \
-    r'{\fontsize{14}{15}\textmd{Mean Bias = ' + str(round(vt['rel_bias'],2))+ r' mmol m\textsuperscript{-2} d\textsuperscript{-1} }}' + '\n' + r"{\fontsize{14}{15}\textbf{ No Temperature Gradients (n = " + str(nvt['n']) + ")}}" + '\n' + r'{\fontsize{14}{15}\textmd{RMSD =  '+str(round(nvt['rmsd'],2)) + r' mmol m\textsuperscript{-2} d\textsuperscript{-1} }}' + '\n' \
-    r'{\fontsize{14}{15}\textmd{Mean Bias = ' + str(round(nvt['rel_bias'],2))+ r' mmol m\textsuperscript{-2} d\textsuperscript{-1} }}' + '\n', transform=ax.transAxes,va = 'top',linespacing=0.9)
+    ax.text(0.11,0.95, r"{\fontsize{16}{17}\textbf{ Temperature Gradients (n = " + str(vt['n']) + ")}}" + '\n' + r"{\fontsize{16}{17}\textmd{RMSD =  "+str(round(vt['rmsd'],2)) + r" mmol m\textsuperscript{-2} d\textsuperscript{-1}} }" + '\n' \
+    r'{\fontsize{16}{17}\textmd{Mean Bias = ' + str(round(vt['rel_bias'],2))+ r' mmol m\textsuperscript{-2} d\textsuperscript{-1} }}' + '\n' + r"{\fontsize{16}{17}\textbf{ No Temperature Gradients (n = " + str(nvt['n']) + ")}}" + '\n' + r'{\fontsize{16}{17}\textmd{RMSD =  '+str(round(nvt['rmsd'],2)) + r' mmol m\textsuperscript{-2} d\textsuperscript{-1} }}' + '\n' \
+    r'{\fontsize{16}{17}\textmd{Mean Bias = ' + str(round(nvt['rel_bias'],2))+ r' mmol m\textsuperscript{-2} d\textsuperscript{-1} }}' + '\n', transform=ax.transAxes,va = 'top',linespacing=0.9)
 
     field_names = vt.keys()
     names = ['NIGHTINGALE','WANNINKHOF','HO','YANG','S3A_Fred','CCI_avhrr_on_metop_a','CCI_s3a+b','CCI_merged']
@@ -555,7 +563,7 @@ fig11.savefig('FIGS/Diurnal_Tsubskin_check.png',format='png',dpi=300)
 # Main figure 1
 
 fig = plt.figure(figsize=(21,15))
-gs = GridSpec(2 ,3, figure=fig, wspace=0.2,hspace=0.2,bottom=0.05,top=0.97,left=0.07,right=0.95) # Setup a 2x2 subplot grid
+gs = GridSpec(2 ,3, figure=fig, wspace=0.2,hspace=0.2,bottom=0.15,top=0.97,left=0.07,right=0.95) # Setup a 2x2 subplot grid
 ax1 = fig.add_subplot(gs[0,1]) # Set top row into a single plot
 ax2 = fig.add_subplot(gs[1,1])
 ax3 = fig.add_subplot(gs[1,0]) # Set bottom row into two plots
@@ -567,12 +575,14 @@ ax2.set_title('AMT29')
 ax5.set_title('AMT28')
 ax6.set_title('AMT29')
 plot_latitude(ax1,AMT[0],'b',ylim=[-15,10])
-plot_latitude(ax2,AMT[1],'e')
+plot_latitude(ax2,AMT[1],'e',leg = True)
 plot_latitude_diff(ax5,AMT[0],'c')
-plot_latitude_diff(ax6,AMT[1],'f')
-plot_scatter(ax3,AMT_m,'d','STATS/ALL.csv')
+plot_latitude_diff(ax6,AMT[1],'f',leg=False)
+plot_scatter(ax3,AMT_m,'d','STATS/ALL.csv',leg='2')
 mapo.plotmap(ax4)
 fig.savefig('FIGS/FIG_2_EC_FE_FLUX_COMPARISION.png',format='png',dpi=300)
+fig.savefig('FIGS/FIG_2_EC_FE_FLUX_COMPARISION.pdf',format='pdf',dpi=600)
+
 
 #--------------------------------------------------------------------------------------------------------------------------------
 # Latitudinal splits
@@ -757,18 +767,18 @@ def wind_speed_split(ax,window,split_val,let=['','',''],val=[7,1]):
     plot_scatter(ax[0],AMT2,let[0],'STATS/ws' + str(split_val[0]) + '_' + str(window) +'h.csv',vals=val)
     f = np.where((AMT_m['ws'] > split_val[0]) & (AMT_m['ws'] <= split_val[1]))
     AMT2 = split_data(AMT_m,f)
-    plot_scatter(ax[1],AMT2,let[1],'STATS/ws' + str(split_val[0]) + '_' + str(split_val[1]) + '_' + str(window) +'h.csv',vals=val)
+    plot_scatter(ax[1],AMT2,let[1],'STATS/ws' + str(split_val[0]) + '_' + str(split_val[1]) + '_' + str(window) +'h.csv',vals=val,leg='1',ylab=False)
     f = np.where((AMT_m['ws'] > split_val[1]))
     AMT2 = split_data(AMT_m,f)
-    plot_scatter(ax[2],AMT2,let[2],'STATS/ws'+str(split_val[1]) + '_' + str(window) +'h.csv',vals=val)
+    plot_scatter(ax[2],AMT2,let[2],'STATS/ws'+str(split_val[1]) + '_' + str(window) +'h.csv',vals=val,ylab=False)
 
     ax[0].set_title('U$_{10}$ $\leq$' +str(split_val[0]) + 'ms$^{-1}$')
     ax[1].set_title(str(split_val[0]) + 'ms$^{-1}$ $<$ U$_{10}$ $\leq$ ' +str(split_val[1]) + 'ms$^{-1}$')
     ax[2].set_title( str(split_val[1]) + 'ms$^{-1}$ $<$ U$_{10}$')
     ax[0].set_ylabel('Indirect CO$_2$ Flux (mmol m$^{-2}$ d$^{-1}$)')
 
-fig10 = plt.figure(figsize=(21,7))
-gs = GridSpec(1,3, figure=fig10, wspace=0.33,hspace=0.2,bottom=0.1,top=0.95,left=0.1,right=0.95)
+fig10 = plt.figure(figsize=(21,8))
+gs = GridSpec(1,3, figure=fig10, wspace=0.2,hspace=0.2,bottom=0.23,top=0.95,left=0.05,right=0.97)
 ax1 = fig10.add_subplot(gs[0,0])
 ax2 = fig10.add_subplot(gs[0,1])
 ax3 = fig10.add_subplot(gs[0,2])
@@ -782,6 +792,7 @@ wind_speed_split([ax1,ax2,ax3],window,[5,11],let = ['a','b','c'],val = [7,1])
 # wind_speed_split([ax4,ax5,ax6],3,[5,11])
 # wind_speed_split([ax7,ax8,ax9],3,[5,12])
 fig10.savefig('FIGS/SUP_FIG_12_WIND_SPEED_REGIMES_IAN.png',format='png',dpi=300)
+fig10.savefig('FIGS/SUP_FIG_12_WIND_SPEED_REGIMES_IAN.pdf',format='pdf',dpi=300)
 #--------------------------------------------------------------------------------------------------------------------------------
 # # Wind speed splits Ian
 # fig12 = plt.figure(figsize=(21,28))
