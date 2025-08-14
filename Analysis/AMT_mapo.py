@@ -92,9 +92,18 @@ def plotmap(ax1):
     m.drawcoastlines()
     parallels = np.arange(-50.,51,25.)
     meridion = [-50,-25,0]
-    m.drawparallels(parallels,labels=[True,False,False,False])
-    m.drawmeridians(meridion,labels=[False,False,False,True])
+    m.drawparallels(parallels,labels=[True,False,False,False],zorder=-2)
+    m.drawmeridians(meridion,labels=[False,False,False,True],zorder=-2)
     ax1.legend(loc=4)
+    ax1.set_xlabel('Longitude',labelpad=30)
+    ax1.set_ylabel('Latitude',labelpad=30)
+    _,parallels = m(parallels,parallels)
+    ax1.set_yticks(parallels,direction='in')
+    ax1.set_yticklabels(['','','','',''])
+
+    meridion,_ = m(meridion,meridion)
+    ax1.set_xticks(meridion,direction='in')
+    ax1.set_xticklabels(['','',''])
 
 def plotbase_scatter(ax1,lon,lat,let=[]):
     m = Basemap(projection='merc',llcrnrlat=-60.1,urcrnrlat=60.1,\

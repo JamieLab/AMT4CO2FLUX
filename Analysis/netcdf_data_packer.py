@@ -5,11 +5,11 @@ from netCDF4 import Dataset
 import numpy as np
 import datetime
 
-# files = ['AMT28/DATA/AMT28_table_20min_version2_i.nc', 'AMT28/DATA/FLUXENGINE_OUT.nc']
-# outfile = 'AMT28_20min_data_v3.nc'
+files = ['AMT28/DATA/AMT28_table_20min_version2_i.nc', 'AMT28/DATA/FLUXENGINE_OUT.nc']
+outfile = 'AMT28_20min_data_v4.nc'
 
-files = ['AMT29/DATA/AMT28_table_20min_version2_i.nc', 'AMT29/DATA/FLUXENGINE_OUT.nc']
-outfile = 'AMT29_20min_data_v3.nc'
+# files = ['AMT29/DATA/AMT28_table_20min_version2_i.nc', 'AMT29/DATA/FLUXENGINE_OUT.nc']
+# outfile = 'AMT29_20min_data_v4.nc'
 
 var1 = ['Pres_mean',
     'fCO2_sw_mean',
@@ -109,7 +109,7 @@ outs.date_created = datetime.datetime.now().strftime(('%d/%m/%Y'))
 outs.created_by = 'Daniel J. Ford (d.ford@exeter.ac.uk)'
 outs.created_from = 'Data created from ' + files[0] + ' and ' + files[1]
 outs.packed_with = 'Data created with netcdf_data_packer.py'
-outs.version = '3'
+outs.version = '4'
 outs.createDimension('time',time.shape[0])
 
 for i in range(len(var1)):
